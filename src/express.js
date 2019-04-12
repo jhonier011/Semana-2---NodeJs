@@ -8,11 +8,9 @@ const bodyParser = require('body-parser');
 require('./Helper');
 const directoriopublico = path.join(__dirname,'../public');
 const port = process.env.PORT || 3000;
-var flash = require('express-flash-messages');
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.static(directoriopublico));
-app.use(flash());
 
 app.use('/css', express.static(dirNode_modules + '/bootstrap/dist/css'));
 app.use('/js', express.static(dirNode_modules + '/jquery/dist'));
