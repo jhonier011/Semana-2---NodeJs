@@ -7,6 +7,7 @@ const funciones = require('./funciones');
 const bodyParser = require('body-parser');
 require('./Helper');
 const directoriopublico = path.join(__dirname,'../public');
+const port = process.env.PORT || 3000;
 var flash = require('express-flash-messages');
 
 app.use(bodyParser.urlencoded({extended:false}));
@@ -88,5 +89,7 @@ app.get('/',(req,res)=>{
   res.send('Hello World')
 })*/
  
-app.listen(3000,()=>{console.log('Escuchando el puerto 3000')});
+app.listen(port,()=>{
+	console.log('Servidor en el puerto ' + port)
+});
 
