@@ -1,5 +1,5 @@
 const hbs = require('hbs');
-hbs.registerHelper('listar',()=>{
+hbs.registerHelper('listar',(Listado)=>{
   var texto = "<table class='table table-hover' id='myTable'> \
   <thead> \
     <tr> \
@@ -9,7 +9,7 @@ hbs.registerHelper('listar',()=>{
     </tr> \
   </thead> \
   <tbody class = 'panel'>";
-  try{
+  /*try{
 	listaCursos = require('./../Cursos.json');
 	
  i =1;
@@ -40,9 +40,25 @@ hbs.registerHelper('listar',()=>{
    texto = texto + "</tbody> \
 </table>";
   return texto;
-}
+}*/
+i = 1;
+Listado.forEach(cursos => {
+  texto = texto + "<tr data-toggle='collapse' data-target='#demo"+i+"' data-parent = '#myTable'> \
+      <td>"+ cursos.nombre+"</td> \
+      <td>"+cursos.descripcion+"</td> \
+      <td>"+cursos.valor+"</td> \
+    </tr> \
+    <tr id='demo"+i+"' class = 'collapse'> \
+      <td colspan = '6' class='hiddenRow'><div>"+"Descripcion: "+cursos.descripcion+"<br>"+"Modalidad: "+cursos.modalidad+"<br>"+"Intensidad: "+cursos.intensidad+"</div> </td> \
+    </tr>";
 
+    i = i +1;
+  });
 
+texto = texto + "</tbody> \
+</table>";
+
+  return texto;
 });
 
 hbs.registerHelper('alerta',(tipo,mensaje)=>{
@@ -62,16 +78,15 @@ hbs.registerHelper('alerta',(tipo,mensaje)=>{
 
 });
 
-hbs.registerHelper('cursos_inscripcion',()=>{
+hbs.registerHelper('cursos_inscripcion',(inscribir)=>{
 
-  try{
-  listaCursos = require('./../Cursos.json');
+  //listaCursos = require('./../Cursos.json');
   let select = "<div class='form-group'> \
                   <label for='exampleInputEmail1'>Lista de cursos</label> \
                   <select class='custom-select' name = 'cursos_inscripcion'>";
 
-  
-  listaCursos.forEach(cursos => {
+
+  inscribir.forEach(cursos => {
     select = select + "<option value='"+cursos.id+"'>"+cursos.nombre+"</option>";
 
   }); 
@@ -79,23 +94,23 @@ hbs.registerHelper('cursos_inscripcion',()=>{
   select = select + "</select> \
                   </div>";
   return select;
-}catch(err){
+/*catch(err){
   return "<div> \
   <h3>"+"No hay cursos para inscribirse"+"</h3> \
   </div>";
-}
+}*/
 
 });
 
 
-hbs.registerHelper('ver_inscritos',()=>{
+hbs.registerHelper('ver_inscritos',(inscritos)=>{
 
-  try{
-  listaCursos = require('./../Cursos.json');
+  //try{
+  //listaCursos = require('./../Cursos.json');
 
   let mostrar = "<div class='accordion' id='accordion_aspirantes'>";
   i = 1;
-  listaCursos.forEach(cursos =>{
+  inscritos.forEach(cursos =>{
 
 
     mostrar = mostrar + "<div class='card'> \
@@ -156,9 +171,9 @@ hbs.registerHelper('ver_inscritos',()=>{
   mostrar = mostrar + "</div>";
 
   return mostrar;
-}catch(err){
+/*}catch(err){
   return "<div> \
   <h3>"+"No hay cursos, tampoco personas inscritas"+"</h3> \
   </div>";
-}
+} */
 });

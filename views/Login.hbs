@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body,html {font-family: Arial, Helvetica, sans-serif;
+margin: 0;
+padding: 0;
+width: 100%;
+height: 100%;
+position: relative;}
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  padding-top: 60px;
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+  border: 1px solid #888;
+  width: 30%; /* Could be more or less, depending on screen size */
+}
+
+.login{
+  border: 3px solid #f1f1f1;
+  width: 300px;
+  position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%,-50%);
+}
+
+input[type=text], input[type=password],input[type=number],input[type=email] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.cancelbtn {
+  border: none;
+  width: 100%;
+  padding: 10px 18px;
+  background-color: #f44336;
+}
+
+
+
+.container {
+  padding: 16px;
+}
+
+span.psw {
+  float: right;
+  padding-top: 16px;
+}
+
+
+h2.headertekst {
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<form action="logearse" method="POST" class="login">
+  <h2 class="headertekst">Login</h2>
+  <div class="container">
+    <label for="uname"><b>Username</b></label>
+    <input type="text" placeholder="Enter Username" name="documento" required>
+
+    <label for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="contrasena" required>
+        
+    <button type="submit">Login</button>
+    <label for="uname">¿No está registrado?</label>
+    <button onclick="document.getElementById('id01').style.display='block'" >Registrarse</button>
+    <button onclick="location.href='/form_interesado'">Entrar como interesado</button>
+      </div>
+</form>
+
+
+<div id="id01" class="modal">
+  
+  <form class="modal-content animate" action="registro_usuarios" method = "POST">
+
+    <div class="container">
+      <label for="uname"><b>Documento</b></label>
+      <input type="number" placeholder="Ingrese documento" name="documento" required></br>
+
+      <label for="psw"><b>Nombre</b></label>
+      <input type="text" placeholder="Ingrese Nombre" name="nombre" required>
+
+      <label for="psw"><b>Correo</b></label>
+      <input type="email" placeholder="Ingrese Correo" name="correo" required>
+
+      <label for="psw"><b>Telefono</b></label>
+      <input type="number" placeholder="Ingrese Telefono" name="telefono" required>
+
+      <label for="psw"><b>Contraseña</b></label>
+      <input type="password" placeholder="Ingrese Contraseña" name="contrasena" required>
+            
+
+      <label for="psw"><b>Tipo de Usuario</b></label>
+      <select  name = "tipo">
+      <option value="aspirante" selected>Aspirante</option>
+      <option value="coordinador">Coordinador</option>
+      </select>
+        
+      <button type="submit">Login</button>
+      <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancelar</button>
+    
+  </form>
+</div>
+
+
+
+
+</body>
+</html>
