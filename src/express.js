@@ -47,10 +47,23 @@ app.post('/Crear_curso',(req,res)=>{
 		estado : 'disponible'
 	});
 	curso.save( (err,resultado) => {
-		if(err){
-			res.render('coordinador');//,{tipo:'warning',mensaje:err});
+
+		Curso.find({}).exec((err2,respuesta)=>{
+		if(err2){
+			return console.log(err);
 		}
-		 res.render('coordinador');//,{tipo:'success',mensaje:'Curso creado con exito'});
+
+		if(err){
+			res.render('coordinador',{inscritos:respuesta,usuario:req.session.nombre,tipo:'warning',mensaje:err});//,{tipo:'warning',mensaje:err});
+		}
+		 res.render('coordinador',{inscritos:respuesta,usuario:req.session.nombre,tipo:'success',mensaje:'Curso creado con exito'});//,{tipo:'success',mensaje:'Curso creado con exito'});
+		//console.log(respuesta);
+			
+		
+	});
+
+
+		
 		
 	} );
 	
@@ -72,7 +85,7 @@ app.post('/registro_usuarios',(req,res)=>{
 			console.log(err);
 			res.render('Login');
 		}
-		res.render('Login');
+		res.render('Login',{tipo:'success',mensaje:'Usuario registrado con exito'});
 	});
 });
 
@@ -90,6 +103,7 @@ app.post('/logearse',(req,res)=>{
 		}
 
 		req.session.documento = resultado.documento;
+		req.session.nombre = resultado.nombre;
 
 		Curso.find({}).exec((err,respuesta)=>{
 		if(err){
@@ -97,11 +111,11 @@ app.post('/logearse',(req,res)=>{
 		}
 		//console.log(respuesta);
 		if(resultado.tipo === "aspirante"){
-		res.render('aspirante',{inscribir:respuesta});
+		res.render('aspirante',{inscribir:respuesta,usuario:req.session.nombre});
 	}
 
 	else{
-			res.render('coordinador',{inscritos:respuesta});
+			res.render('coordinador',{inscritos:respuesta,usuario:req.session.nombre});
 		}
 	});
 
@@ -126,16 +140,28 @@ app.get('/form_interesado',(req,res)=>{
 
 });
 
-app.post('/form_coordinador',(req,res)=>{
-res.render('coordinador');
-
-});
-
 
 app.post('/eliminar_aspirante',(req,res)=>{
 
-	funciones.eliminar_aspirante(req.body.documento,req.body.id_curso);
-	res.render('index',{tipo:'success',mensaje:'Eliminado satisfactoriamente'});
+	Curso.findOneAndUpdate({id:req.body.id_curso},{$pull:{aspirantes:{documento:req.body.documento}}},{runValidators: true, context: 'query'},(err,cursoo) =>{
+		//listo los aspirantes
+
+		//console.log('hola'+cursoo);
+
+
+		Curso.find({}).exec((err,respuesta)=>{
+		if(err){
+			return console.log(err);
+		}
+		//console.log(respuesta);
+			res.render('coordinador',{inscritos:respuesta,usuario:req.session.nombre,tipo:'success',mensaje:'Eliminado satisfactoriamente'});
+	
+	});
+		
+	});
+
+	//funciones.eliminar_aspirante(req.body.documento,req.body.id_curso);
+	//res.render('index',{tipo:'success',mensaje:'Eliminado satisfactoriamente'});
 
 });
 
@@ -153,20 +179,24 @@ app.post('/inscribir_aspirante',(req,res)=>{
 	};
 
 	console.log(req.body.cursos_inscripcion);
-	Curso.findOneAndUpdate({id:req.body.cursos_inscripcion},{$push:{aspirantes:aspirante}},(err,cursoo) =>{
+	Curso.findOneAndUpdate({id:req.body.cursos_inscripcion},{$push:{aspirantes:aspirante}},{runValidators: true, context: 'query'},(err1,cursoo) =>{
 		//listo los aspirantes
 
-		console.log('hola'+cursoo);
+		Curso.find({}).exec((err2,respuesta)=>{
+		if (err1){
+			res.render('aspirante',{inscribir:respuesta,usuario:req.session.nombre,tipo:'warning',mensaje:err1});
+		}
+		if(err2){
+			return console.log(err2);
+		}
+		//console.log(respuesta);
+		res.render('aspirante',{inscribir:respuesta,usuario:req.session.nombre,tipo:'success',mensaje:'Inscrito satisfactoriamente'});
+	});
+
 	});
 	
 
-	Curso.find({}).exec((err,respuesta)=>{
-		if(err){
-			return console.log(err);
-		}
-		//console.log(respuesta);
-		res.render('aspirante',{inscribir:respuesta});
-	});
+	
 
 	//res.render('aspirante');
 	});
@@ -183,8 +213,25 @@ app.post('/inscribir_aspirante',(req,res)=>{
 
 
 app.post('/cambiar_estado',(req,res)=>{
-	funciones.cambiar_estado(req.body.id_curso);
-	res.render('index',{tipo:'success',mensaje:'Cambiado estado del curso'});
+		Curso.findOneAndUpdate({id:req.body.id_curso},{estado:(req.body.estado_curso === 'disponible' ? 'cerrado':'disponible')},{runValidators: true, context: 'query'},(err,cursoo) =>{
+		//listo los aspirantes
+		//req.body.intensidad === '' ? '-':req.body.intensidad
+		//console.log('hola'+cursoo);
+
+		Curso.find({}).exec((err,respuesta)=>{
+		if(err){
+			return console.log(err);
+		}
+		//console.log(respuesta);
+			res.render('coordinador',{inscritos:respuesta,usuario:req.session.nombre,tipo:'success',mensaje:'Estado del curso actualizado'});
+		
+	});
+
+	});
+
+
+	//funciones.cambiar_estado(req.body.id_curso);
+	//res.render('index',{tipo:'success',mensaje:'Cambiado estado del curso'});
 });
 
 
@@ -197,7 +244,7 @@ app.get('/',(req,res)=>{
 })*/
 
 
-mongoose.connect('mongodb://localhost:27017/trabajo3', {useNewUrlParser: true}, (err,resultado) => {
+mongoose.connect(process.env.URLDB, {useNewUrlParser: true}, (err,resultado) => {
 	if(err){
 		return console.log(err);
 	}

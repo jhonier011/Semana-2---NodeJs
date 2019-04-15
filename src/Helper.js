@@ -1,4 +1,12 @@
 const hbs = require('hbs');
+
+
+hbs.registerHelper('nombre',(usuario)=>{
+
+  return "<h2>"+"Usuario Actual: "+usuario+"</h2>"
+});
+
+
 hbs.registerHelper('listar',(Listado)=>{
   var texto = "<table class='table table-hover' id='myTable'> \
   <thead> \
@@ -43,6 +51,7 @@ hbs.registerHelper('listar',(Listado)=>{
 }*/
 i = 1;
 Listado.forEach(cursos => {
+  if(cursos.estado === 'disponible'){
   texto = texto + "<tr data-toggle='collapse' data-target='#demo"+i+"' data-parent = '#myTable'> \
       <td>"+ cursos.nombre+"</td> \
       <td>"+cursos.descripcion+"</td> \
@@ -53,6 +62,7 @@ Listado.forEach(cursos => {
     </tr>";
 
     i = i +1;
+  }
   });
 
 texto = texto + "</tbody> \
@@ -120,6 +130,7 @@ hbs.registerHelper('ver_inscritos',(inscritos)=>{
           "+cursos.nombre+" \
           <form action='cambiar_estado' method='post'> \
       <input type='hidden' name = 'id_curso' value = '"+cursos.id+"'> \
+      <input type='hidden' name = 'estado_curso' value = '"+cursos.estado+"'> \
       <button type='submit' class='btn btn-primary'>"+cursos.estado+"</button> \
       </form> \
         </button> \
