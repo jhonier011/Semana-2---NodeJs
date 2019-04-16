@@ -287,7 +287,7 @@ app.get('/',(req,res)=>{
 })*/
 
 
-mongoose.connect('mongodb://localhost:27017/trabajo3', {useCreateIndex: true,useNewUrlParser: true}, (err,resultado) => {
+mongoose.connect(process.env.URLDB, {useCreateIndex: true,useNewUrlParser: true}, (err,resultado) => {
 	if(err){
 		return console.log(err);
 	}
