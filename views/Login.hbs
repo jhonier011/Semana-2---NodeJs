@@ -89,6 +89,8 @@ h2.headertekst {
 </style>
 </head>
 <body>
+<h2 style="color:red">{{texto_error}}</h2>
+
 <form action="logearse" method="POST" class="login">
   <h2 class="headertekst">Login</h2>
   <div class="container">
@@ -109,8 +111,7 @@ h2.headertekst {
 <div id="id01" class="modal">
   
   <form class="modal-content animate" action="registro_usuarios" method = "POST">
-
-    <div class="container">
+      <div class="container">
       <label for="uname"><b>Documento</b></label>
       <input type="number" placeholder="Ingrese documento" name="documento" required></br>
 

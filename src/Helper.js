@@ -1,5 +1,5 @@
 const hbs = require('hbs');
-
+const Curso = require('./models/curso');
 
 hbs.registerHelper('nombre',(usuario)=>{
 
@@ -73,7 +73,9 @@ texto = texto + "</tbody> \
 
 hbs.registerHelper('alerta',(tipo,mensaje)=>{
 
-  if(!tipo){}
+  if(!tipo){
+    
+  }
   else{
 
   let alert = "<div class='alert alert-"+tipo+"' role='alert'> \
@@ -115,12 +117,11 @@ hbs.registerHelper('cursos_inscripcion',(inscribir)=>{
 
 hbs.registerHelper('ver_inscritos',(inscritos)=>{
 
-  //try{
-  //listaCursos = require('./../Cursos.json');
-
   let mostrar = "<div class='accordion' id='accordion_aspirantes'>";
   i = 1;
-  inscritos.forEach(cursos =>{
+
+  
+    inscritos.forEach(cursos =>{
 
 
     mostrar = mostrar + "<div class='card'> \
@@ -160,8 +161,8 @@ hbs.registerHelper('ver_inscritos',(inscritos)=>{
       <td>"+aspirante.telefono+"</td> \
       <td> \
       <form action='eliminar_aspirante' method='post'> \
-      <input type='hidden' name = 'documento' value = '"+aspirante.documento+"'> \
-      <input type='hidden' name = 'id_curso' value = '"+cursos.id+"'> \
+      <input type='hidden' name = 'documento_eliminar' value = '"+aspirante.documento+"'> \
+      <input type='hidden' name = 'id_curso_eliminar' value = '"+cursos.id+"'> \
       <button type='submit' class='btn btn-danger' >Eliminar</button> \
       </form> \
       </td> \
@@ -178,6 +179,14 @@ hbs.registerHelper('ver_inscritos',(inscritos)=>{
   i = i + 1;
 
   });
+     
+      
+  
+  //try{
+  //listaCursos = require('./../Cursos.json');
+
+  
+  
 
   mostrar = mostrar + "</div>";
 

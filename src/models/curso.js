@@ -12,8 +12,8 @@ const CursoSchema = new Schema({
 	},
 	id:{
 		type:Number,
-		require:true,
-		unique: true
+		unique: true,
+		require:true
 	},
 	descripcion:{
 		type:String,
@@ -22,8 +22,7 @@ const CursoSchema = new Schema({
 	},
 	aspirantes:{
 		type:Array,
-		require:true,
-		unique: true
+		require:true
 	},
 	valor:{
 		type:Number,

@@ -14,7 +14,9 @@ const directoriopublico = path.join(__dirname,'../public');
 const port = process.env.PORT || 3000;
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const session = require('express-session')
+const session = require('express-session');
+//var MemoryStore = require('memorystore')(session);
+
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.static(directoriopublico));
@@ -26,11 +28,20 @@ app.use('/js', express.static(dirNode_modules + '/popper.js/dist'));
 app.use('/js', express.static(dirNode_modules + '/bootstrap/dist/js'));
 app.set('view engine','hbs');
 
+/*app.use(session({
+    cookie: { maxAge: 86400000 },
+    store: new MemoryStore({
+      checkPeriod: 86400000 // prune expired entries every 24h
+    }),
+    secret: 'keyboard cat',
+    resave: false,
+  saveUninitialized: true
+}));*/
 app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
+  secret: '123456',
+  resave: true,
   saveUninitialized: true,
-  cookie: { secure: true }
+  cookie: { secure: false }
 }));
 
 
@@ -48,19 +59,20 @@ app.post('/Crear_curso',(req,res)=>{
 	});
 	curso.save( (err,resultado) => {
 
-		Curso.find({}).exec((err2,respuesta)=>{
-		if(err2){
-			return console.log(err);
+		Curso.find({}).exec((err2,docs)=>{
+
+			if(err){
+			res.render('coordinador',{usuario:req.session.nombre,inscritos:docs,tipo:'warning',mensaje:err});//,{tipo:'warning',mensaje:err});
 		}
 
-		if(err){
-			res.render('coordinador',{inscritos:respuesta,usuario:req.session.nombre,tipo:'warning',mensaje:err});//,{tipo:'warning',mensaje:err});
+		else{
+		 res.render('coordinador',{usuario:req.session.nombre,inscritos:docs,tipo:'success',mensaje:'Curso creado con exito'});//,{tipo:'success',mensaje:'Curso creado con exito'});
 		}
-		 res.render('coordinador',{inscritos:respuesta,usuario:req.session.nombre,tipo:'success',mensaje:'Curso creado con exito'});//,{tipo:'success',mensaje:'Curso creado con exito'});
-		//console.log(respuesta);
-			
+
+		});
+
 		
-	});
+		//console.log(respuesta);
 
 
 		
@@ -82,7 +94,7 @@ app.post('/registro_usuarios',(req,res)=>{
 	});
 	usuario.save( (err,resultado) =>{
 		if(err){
-			console.log(err);
+			//console.log(err);
 			res.render('Login');
 		}
 		res.render('Login',{tipo:'success',mensaje:'Usuario registrado con exito'});
@@ -92,17 +104,23 @@ app.post('/registro_usuarios',(req,res)=>{
 app.post('/logearse',(req,res)=>{
 
 	Usuario.findOne({documento:req.body.documento},(err,resultado)=>{
+
+		console.log(resultado);
 		if(err){
 			return console.log(err);
 		}
-		if(!resultado){
-			return console.log("usuario no encontrado");
+		if(!resultado || resultado === null){
+			//return console.log("usuario no encontrado");
+			console.log("si entra");
+			res.render('Login',{texto_error:"usuario no encontrado"});
 		}
 		if(!bcrypt.compareSync(req.body.contrasena,resultado.contrasena)){
-			return console.log("contraseña no correcta");
+			//return console.log("contraseña no correcta");
+			res.render('Login',{texto_error:"contraseña no correcta"});
 		}
 
-		req.session.documento = resultado.documento;
+		//req.session.documento = resultado.documento;
+		else{
 		req.session.nombre = resultado.nombre;
 
 		Curso.find({}).exec((err,respuesta)=>{
@@ -115,9 +133,10 @@ app.post('/logearse',(req,res)=>{
 	}
 
 	else{
-			res.render('coordinador',{inscritos:respuesta,usuario:req.session.nombre});
+			res.render('coordinador',{usuario:req.session.nombre,inscritos:respuesta});
 		}
 	});
+	}
 
 		
 		
@@ -143,10 +162,10 @@ app.get('/form_interesado',(req,res)=>{
 
 app.post('/eliminar_aspirante',(req,res)=>{
 
-	Curso.findOneAndUpdate({id:req.body.id_curso},{$pull:{aspirantes:{documento:req.body.documento}}},{runValidators: true, context: 'query'},(err,cursoo) =>{
+	Curso.updateOne({id:req.body.id_curso_eliminar},{$pull:{aspirantes:{documento:req.body.documento_eliminar}}},(err,cursoo) =>{
 		//listo los aspirantes
 
-		//console.log('hola'+cursoo);
+		console.log(req.body.id_curso_eliminar+req.body.documento_eliminar);
 
 
 		Curso.find({}).exec((err,respuesta)=>{
@@ -154,11 +173,15 @@ app.post('/eliminar_aspirante',(req,res)=>{
 			return console.log(err);
 		}
 		//console.log(respuesta);
+		else{
 			res.render('coordinador',{inscritos:respuesta,usuario:req.session.nombre,tipo:'success',mensaje:'Eliminado satisfactoriamente'});
+		}
 	
 	});
 		
 	});
+
+
 
 	//funciones.eliminar_aspirante(req.body.documento,req.body.id_curso);
 	//res.render('index',{tipo:'success',mensaje:'Eliminado satisfactoriamente'});
@@ -170,7 +193,7 @@ app.post('/eliminar_aspirante',(req,res)=>{
 app.post('/inscribir_aspirante',(req,res)=>{
 
 	Usuario.findOne(req.session.documento, (err,usuario) =>{
-		console.log(usuario);
+		//console.log(usuario);
 		let aspirante = {
 		documento : usuario.documento,
 		nombre : usuario.nombre,
@@ -179,21 +202,41 @@ app.post('/inscribir_aspirante',(req,res)=>{
 	};
 
 	console.log(req.body.cursos_inscripcion);
-	Curso.findOneAndUpdate({id:req.body.cursos_inscripcion},{$push:{aspirantes:aspirante}},{runValidators: true, context: 'query'},(err1,cursoo) =>{
+
+	Curso.updateOne(
+    {id:req.body.cursos_inscripcion, 'aspirantes.documento': {$ne: aspirante.documento}}, 
+    {$push: {aspirantes: aspirante}},
+    function(err1, resp) { 
+    	//console.log(err1 ? err1:numAffected.n);
+    	Curso.find({}).exec((err2,respuesta)=>{
+		if (resp.n == 0){
+			res.render('aspirante',{inscribir:respuesta,usuario:req.session.nombre,tipo:'warning',mensaje:"ya estas inscrito en este curso"});
+		}
+		
+		//console.log(respuesta);
+		else{
+		res.render('aspirante',{inscribir:respuesta,usuario:req.session.nombre,tipo:'success',mensaje:'Inscrito satisfactoriamente'});
+		}
+	});
+
+
+     });
+
+	/*Curso.findOneAndUpdate({id:req.body.cursos_inscripcion},{$push:{aspirantes:aspirante}},{runValidators: true, context: 'query'},(err1,cursoo) =>{
 		//listo los aspirantes
 
 		Curso.find({}).exec((err2,respuesta)=>{
 		if (err1){
 			res.render('aspirante',{inscribir:respuesta,usuario:req.session.nombre,tipo:'warning',mensaje:err1});
 		}
-		if(err2){
-			return console.log(err2);
-		}
+		
 		//console.log(respuesta);
+		else{
 		res.render('aspirante',{inscribir:respuesta,usuario:req.session.nombre,tipo:'success',mensaje:'Inscrito satisfactoriamente'});
+		}
 	});
 
-	});
+	});*/
 	
 
 	
@@ -244,7 +287,7 @@ app.get('/',(req,res)=>{
 })*/
 
 
-mongoose.connect(process.env.URLDB, {useNewUrlParser: true}, (err,resultado) => {
+mongoose.connect('mongodb://localhost:27017/trabajo3', {useCreateIndex: true,useNewUrlParser: true}, (err,resultado) => {
 	if(err){
 		return console.log(err);
 	}
