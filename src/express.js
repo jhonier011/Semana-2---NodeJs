@@ -15,7 +15,7 @@ const port = process.env.PORT || 3000;
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
-//var MemoryStore = require('memorystore')(session);
+var MemoryStore = require('memorystore')(session);
 
 
 app.use(bodyParser.urlencoded({extended:false}));
@@ -28,21 +28,22 @@ app.use('/js', express.static(dirNode_modules + '/popper.js/dist'));
 app.use('/js', express.static(dirNode_modules + '/bootstrap/dist/js'));
 app.set('view engine','hbs');
 
-/*app.use(session({
+app.use(session({
     cookie: { maxAge: 86400000 },
     store: new MemoryStore({
       checkPeriod: 86400000 // prune expired entries every 24h
     }),
     secret: 'keyboard cat',
-    resave: false,
-  saveUninitialized: true
-}));*/
+}));
+
+/*
 app.use(session({
   secret: '123456',
   resave: true,
   saveUninitialized: true,
   cookie: { secure: false }
 }));
+*/
 
 
 //formulario crear curso
