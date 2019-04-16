@@ -288,7 +288,7 @@ app.get('/',(req,res)=>{
 })*/
 
 
-mongoose.connect(process.env.URLDB, {useCreateIndex: true,useNewUrlParser: true}, (err,resultado) => {
+mongoose.connect('mongodb+srv://admin:admin@cluster0-xkbch.mongodb.net/test?retryWrites=true', {useCreateIndex: true,useNewUrlParser: true}, (err,resultado) => {
 	if(err){
 		return console.log(err);
 	}
